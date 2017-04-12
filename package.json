@@ -1,0 +1,25 @@
+{
+  "name": "@xogeny/mat-parser",
+  "version": "0.1.0",
+  "description": "A parser for MATLAB v4 files",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "MATLAB"
+  ],
+  "author": "Michael M. Tiller",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^3.5.0",
+    "@types/mocha": "^2.2.40",
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "ts-node": "^3.0.2",
+    "typescript": "^2.2.2"
+  },
+  "dependencies": {
+    "@types/node": "^7.0.12"
+  }
+}
