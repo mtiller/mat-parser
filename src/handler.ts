@@ -1,16 +1,16 @@
 import { MatrixType } from './types';
 
 export interface Handler {
-    start(name: string): void;
-    column(colnum: number, name: string, format: MatrixType, column: Array<any>): void;
+    start(name: string, rows: number, cols: number): void;
+    column(name: string, colnum: number, format: MatrixType, column: Array<any>, last: boolean): void;
     end(name: string): void;
     eof(): void;
     error(err: Error): void;
 }
 
 export class NullHandler implements Handler {
-    start(name: string) {}
-    column(colnum: number, name: string, format: MatrixType, column: Array<any>): void {}
+    start(name: string, rows: number, cols: number) {}
+    column(name: string, colnum: number, format: MatrixType, column: Array<any>, last: boolean): void {}
     end(name: string): void {}
     eof(): void {}
     error(err: Error): void {}

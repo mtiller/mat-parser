@@ -1,21 +1,7 @@
 import { expect } from 'chai';
 import { MatFile, blobReader, chunkReader, Handler } from '../src';
 import { Observable } from 'rxjs';
-import path = require('path');
-
-function sampleFile(name: string) {
-    if (process.env["NODE_ENV"] == "testing") {
-        return path.join(__dirname, "..", "..", "samples", name);
-    } else {
-        return path.join(__dirname, "..", "samples", name);
-    }
-}
-
-export const highLevelEvents = (e: Event) => {
-    if (e.type == "matrix" || e.type == "end" || e.type == "eof") console.log(JSON.stringify(e));
-}
-
-type Tally = { [key: string]: number };
+import { files, counts, initialCounts, Tally, sampleFile } from './data';
 
 class CountHandler implements Handler {
     public tally: Tally = { ...initialCounts };
@@ -24,31 +10,6 @@ class CountHandler implements Handler {
     column() { this.tally["column"]++ }
     eof() { this.tally["eof"]++ }
     error() { this.tally["error"]++ }
-}
-
-const initialCounts: Tally = {
-    "matrix": 0,
-    "column": 0,
-    "end": 0,
-    "eof": 0,
-    "error": 0,
-}
-
-const counts = {
-    "Comparison.mat": {
-        matrix: 6,
-        end: 6,
-        eof: 1,
-        column: 1243,
-        error: 0,
-    },
-    "drvres.mat": {
-        matrix: 6,
-        end: 6,
-        eof: 1,
-        column: 85640,
-        error: 0,
-    }
 }
 
 function aggregate(obs: Observable<Buffer>): Promise<Buffer> {
@@ -67,7 +28,6 @@ function aggregate(obs: Observable<Buffer>): Promise<Buffer> {
 }
 
 describe("Test readers", () => {
-    let files = Object.keys(counts);
     for (let i = 0; i < files.length; i++) {
         let filename = files[i];
         it("should parse '" + filename + "' using chunk reader", async () => {
@@ -81,7 +41,6 @@ describe("Test readers", () => {
 })
 
 describe("Test MATLAB parser", () => {
-    let files = Object.keys(counts);
     for (let i = 0; i < files.length; i++) {
         let filename = files[i];
         it("should parse '"+filename+"' as observable streams", async () => {

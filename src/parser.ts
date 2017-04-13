@@ -26,6 +26,15 @@ interface ParserState {
     name: string | null;
 }
 
+/**
+ * This class takes data from an Observer that passes a sequence of buffer corresponding to the
+ * bytes in a MATLAB v4 file.  This class parses that binary data and fires calls to a Handler
+ * class that can then do with that information what it wishes.
+ * 
+ * The format is documented here:
+ * 
+ * https://www.mathworks.com/help/pdf_doc/matlab/matfile_format.pdf
+ */
 export class MatFile {
     private state: ParserState;
     constructor(protected source: Observable<Buffer>) {
@@ -115,7 +124,7 @@ export class MatFile {
                 let name = this.state.rem.slice(0, this.state.header.namelen - 1).toString("ascii");
                 try {
                     if (handler) {
-                        handler.start(name);
+                        handler.start(name, this.state.header.rows, this.state.header.cols);
                     }
                 } catch (e) {
                     console.error("Ignoring error in handling matrix event: ", e);
@@ -137,7 +146,8 @@ export class MatFile {
                 }
                 try {
                     if (handler) {
-                        handler.column(this.state.colnum, this.state.name, this.state.header.matrix, col);
+                        handler.column(this.state.name, this.state.colnum, this.state.header.matrix,
+                            col, this.state.colnum == this.state.header.cols-1);
                     }
                 } catch (e) {
                     console.error("Ignore error in handling column event: ", e);
