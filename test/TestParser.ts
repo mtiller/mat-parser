@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import { MatFile, Event, blobReader } from '../src';
+import { MatFile, Event, blobReader, chunkReader } from '../src';
+import { Observable } from 'rxjs';
 import path = require('path');
 
 function sampleFile(name: string) {
@@ -37,8 +38,45 @@ const counts = {
         eof: 1,
         column: 1243,
         error: 0,
+    },
+    "drvres.mat": {
+        matrix: 6,
+        end: 6,
+        eof: 1,
+        column: 85640,
+        error: 0,
     }
 }
+
+function aggregate(obs: Observable<Buffer>): Promise<Buffer> {
+    let ret = Buffer.alloc(0);
+    return new Promise<Buffer>((resolve, reject) => {
+        let sub = obs.subscribe((chunk) => {
+            ret = Buffer.concat([ret, chunk]);
+        }, (err) => {
+            sub.unsubscribe();
+            reject(err);
+        }, () => {
+            sub.unsubscribe();
+            resolve(ret);
+        })
+    })
+}
+
+describe("Test readers", () => {
+    it("should work for chunk reader", async () => {
+        let files = Object.keys(counts);
+        for (let i = 0; i < files.length; i++) {
+            let filename = files[i];
+            let fullname = sampleFile(filename);
+            let blob = await aggregate(blobReader(fullname));
+            let chunked = await aggregate(chunkReader(fullname));
+            expect(blob.length).to.equal(chunked.length, "Expected sizes to match");
+            expect(blob).to.deep.equal(chunked);
+        }
+    })
+})
+
 describe("Test MATLAB parser", () => {
     it("should parse samples as observable streams", async () => {
         let files = Object.keys(counts);

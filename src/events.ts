@@ -1,4 +1,4 @@
-import { MatrixType } from './dataformats';
+import { MatrixType } from './types';
 
 export interface MatrixStartEvent {
     type: "matrix";

@@ -14,13 +14,15 @@ export function blobReader(filename: string) {
 }
 
 export function chunkReader(filename: string) {
+    let count = 0;
     let subj = new Subject<Buffer>();
     let stream = fs.createReadStream(filename, {});
     stream.on('data', (chunk: Buffer) => {
+        count += chunk.length;
         subj.next(chunk);
     })
     stream.on('readable', () => {
-        console.log("Readable received...what does this mean");
+        //console.log("Readable received...what does this mean");
     })
     stream.on('end', () => {
         subj.complete();

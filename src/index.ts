@@ -1,4 +1,4 @@
 export * from './parser';
-export * from './dataformats';
+export * from './types';
 export * from './readers';
 export * from './events';

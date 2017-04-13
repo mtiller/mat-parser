@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { DataFormat, readOne, dataSize, MatrixType, matrixType, dataType } from './dataformats';
+import { DataFormat, readOne, dataSize, MatrixType, matrixType, dataType } from './types';
 import { Handler } from './events';
 
 export interface Header {
@@ -268,7 +268,7 @@ export class MatFile {
                 if (this.state.colnum == null) throw new Error("Expected column number to be set, but was null. This should not happen");
                 if (this.state.name == null) throw new Error("Expected matrix to be named, but found null. This should not happen");
                 if (size < dataSize(this.state.header.data, this.state.header.rows)) return false;
-                console.log("Processing column " + this.state.colnum + " of " + this.state.header.cols + " in " + this.state.name + "...");
+
                 let col: any[] = [];
                 for (let i = 0; i < this.state.header.rows; i++) {
                     this.state.rem = readOne(col, this.state.header.data, this.state.rem);
