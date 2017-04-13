@@ -51,3 +51,9 @@ export function readOne(info: Array<any>, format: DataFormat, buffer: Buffer): B
     }
     return buffer.slice(dataSize(format, 1));
 }
+
+export enum MatrixType {
+    FullNumeric,
+    SparseNumeric,
+    Text,
+}

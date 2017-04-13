@@ -1,4 +1,6 @@
-export interface MatrixEvent {
+import { MatrixType } from './dataformats';
+
+export interface MatrixStartEvent {
     type: "matrix";
     name: string;
 }
@@ -7,12 +9,17 @@ export interface ColumnEvent {
     type: "column";
     colnum: number;
     name: string;
+    format: MatrixType;
     column: Array<any>;
 }
 
-export interface EndEvent {
+export interface MatrixEndEvent {
     type: "end";
     name: string;
+}
+
+export interface EndOfFileEvent {
+    type: "eof";
 }
 
 export interface ErrorEvent {
@@ -20,7 +27,7 @@ export interface ErrorEvent {
     err: Error;
 }
 
-export type Event = MatrixEvent | ColumnEvent | ErrorEvent | EndEvent;
+export type Event = MatrixStartEvent | ColumnEvent | ErrorEvent | MatrixEndEvent | EndOfFileEvent;
 
 /**
  * A Handler should return true if it wants to continue;
