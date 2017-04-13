@@ -34,14 +34,14 @@ export const signals: Signals = {
             "nr_nl.I1.der(phi)": 0.017469031736254692,
         },
     },
-    "drvres.mat": {
+    "ACDC.mat": {
         trajs: {
-            "Time": 580,
-            "atmosphere.T": 1,
+            "Time": 52631,
+            "capacitor.v": 52631,
         },
         finals: {
-            "Time": 50,
-            "atmosphere.p": 100000,
+            "Time": 1,
+            "load_switch.width[1]": 50,
         },
     }
 }
@@ -53,11 +53,11 @@ export const counts = {
         column: 1243,
         error: 0,
     },
-    "drvres.mat": {
+    "ACDC.mat": {
         matrix: 6,
         end: 6,
         eof: 1,
-        column: 85640,
+        column: 52917,
         error: 0,
     }
 }
