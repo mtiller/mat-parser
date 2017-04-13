@@ -10,7 +10,7 @@ function sampleFile(name: string) {
     }
 }
 
-const highLevelEvents = (e: Event) => {
+export const highLevelEvents = (e: Event) => {
     if (e.type == "matrix" || e.type == "end" || e.type == "eof") console.log(JSON.stringify(e));
 }
 
@@ -46,38 +46,39 @@ describe("Test MATLAB parser", () => {
             let filename = files[i];
             let tally: Tally = { ...initialCounts };
             let fullname = sampleFile(filename);
-            let file = new MatFile(fullname);
-            await file.obs(blobReader(fullname), countEvent(tally));
+            let obs = blobReader(fullname);
+            let file = new MatFile(obs);
+            await file.parse(countEvent(tally));
             expect(tally).to.deep.equal(counts[filename]);
         }
     })
-    it.skip("should parse an existing MATLAB file as a single blob", async () => {
-        let file = new MatFile(sampleFile("Comparison.mat"));
-        let tally: Tally = { ...initialCounts };
-        await file.blob(countEvent(tally));
-        //await file.blob(highLevelEvents);  
-        expect(tally).to.deep.equal({
-            matrix: 6,
-            end: 6,
-            eof: 1,
-            column: 1243,
-            error: 0,
-        })
-    })
-    it.skip("should parse an existing MATLAB file", async () => {
-        let file = new MatFile(sampleFile("Comparison.mat"));
-        await file.chunks(highLevelEvents);
-        // new MatFile(sampleFile, (e) => {
-        //     if (e.type == "column" && e.format == MatrixType.Text) {
-        //         //console.log("Column = ", Buffer.from(e.column).toString('ascii'));
-        //     } else {
-        //         console.log("Event: " + JSON.stringify(e));
-        //     }
-        // });
-        //let emitter: NodeJS.EventEmitter = matlabParser(sampleFile);
-    })
-    it.skip("should parse an existing MATLAB file as a stream", async () => {
-        let file = new MatFile(sampleFile("Comparison.mat"));
-        file.stream(highLevelEvents);
-    })
+    // it.skip("should parse an existing MATLAB file as a single blob", async () => {
+    //     let file = new MatFile(sampleFile("Comparison.mat"));
+    //     let tally: Tally = { ...initialCounts };
+    //     await file.blob(countEvent(tally));
+    //     //await file.blob(highLevelEvents);  
+    //     expect(tally).to.deep.equal({
+    //         matrix: 6,
+    //         end: 6,
+    //         eof: 1,
+    //         column: 1243,
+    //         error: 0,
+    //     })
+    // })
+    // it.skip("should parse an existing MATLAB file", async () => {
+    //     let file = new MatFile(sampleFile("Comparison.mat"));
+    //     await file.chunks(highLevelEvents);
+    //     // new MatFile(sampleFile, (e) => {
+    //     //     if (e.type == "column" && e.format == MatrixType.Text) {
+    //     //         //console.log("Column = ", Buffer.from(e.column).toString('ascii'));
+    //     //     } else {
+    //     //         console.log("Event: " + JSON.stringify(e));
+    //     //     }
+    //     // });
+    //     //let emitter: NodeJS.EventEmitter = matlabParser(sampleFile);
+    // })
+    // it.skip("should parse an existing MATLAB file as a stream", async () => {
+    //     let file = new MatFile(sampleFile("Comparison.mat"));
+    //     file.stream(highLevelEvents);
+    // })
 })

@@ -57,3 +57,20 @@ export enum MatrixType {
     SparseNumeric,
     Text,
 }
+
+export function dataType(n: string): DataFormat {
+    if (n == "0") return DataFormat.Float64;
+    if (n == "1") return DataFormat.Float32;
+    if (n == "2") return DataFormat.Int32;
+    if (n == "3") return DataFormat.Int16;
+    if (n == "4") return DataFormat.UInt16;
+    if (n == "5") return DataFormat.UInt8;
+    throw new Error("Invalid data type '" + n + "'");
+}
+
+export function matrixType(n: string): MatrixType {
+    if (n == "0") return MatrixType.FullNumeric;
+    if (n == "1") return MatrixType.Text;
+    if (n == "2") return MatrixType.SparseNumeric;
+    throw new Error("Invalid matrix type '" + n + "'");
+}
