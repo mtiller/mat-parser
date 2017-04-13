@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
 import { DataFormat, readOne, dataSize, MatrixType, matrixType, dataType } from './types';
-import { Handler } from './events';
+import { Handler } from './handler';
 
-export interface Header {
+interface Header {
     data: DataFormat;
     matrix: MatrixType;
     rows: number;
@@ -11,14 +11,14 @@ export interface Header {
     namelen: number;
 }
 
-export enum Expecting {
+enum Expecting {
     Header,
     Name,
     Row,
     Nothing, // Closed, Error
 }
 
-export interface ParserState {
+interface ParserState {
     rem: Buffer;
     expecting: Expecting;
     header: Header | null;
@@ -30,40 +30,6 @@ export class MatFile {
     private state: ParserState;
     constructor(protected source: Observable<Buffer>) {
         this.resetState();
-        // this.stream = fs.createReadStream(filename, {
-        //     // autoClose?
-        // });
-        // console.log("eventNames = ", this.stream.eventNames());
-        // this.stream.on('data', (chunk: Buffer) => {
-        //     console.log(">>> Adding new chunk of size "+chunk.length+" to existing chunk of size "+this.rem.length);
-        //     this.rem = Buffer.concat([this.rem, chunk]);
-        //     try {
-        //         while (this.processBuffer());
-        //     } catch (e) {
-        //         this.sendError(e);
-        //     }
-        // });
-        // this.stream.on('error', (err: Error) => {
-        //     console.error(err);
-        //     this.sendError(err);
-        // });
-        // this.stream.on('end', () => {
-        //     console.error("'end' event caught!");
-        // })
-        // this.stream.on('close', () => {
-        //     try {
-        //         while (this.processBuffer());
-        //     } catch (e) {
-        //         this.sendError(e);
-        //     }
-        //     if (this.expecting!=Expecting.Header) {
-        //         console.error("End of file encountered mid-file in "+filename);
-        //     } else {
-        //         console.log("Found EOF");
-        //     }
-        //     this.handler({ type: "eof", filename: filename });
-        // });
-        // this.stream.resume();
     }
     private resetState() {
         this.state = {
@@ -90,120 +56,21 @@ export class MatFile {
                 reject(err);
             }, () => {
                 if (this.state.rem.length == 0) {
-                    handler({ type: "eof" });
+                    handler.eof();
                     resolve(undefined);
                 }
                 else reject(new Error("Ran out of data prematurely"));
             })
         })
     }
-    // readBytes(rs: fs.ReadStream, num: number): Promise<Buffer | null> {
-    //     return new Promise<Buffer | null>((resolve, reject) => {
-    //         try {
-    //             let buf = rs.read(num);
-    //             if (buf) {
-    //                 if (buf.length < num) {
-    //                     let left = num - buf.length;
-    //                     console.log("Found ourselves " + left + " short");
-    //                     this.readBytes(rs, left).then((rem) => {
-    //                         if (rem == null) reject(new Error("Couldn't finish incomplete chunk"));
-    //                         else {
-    //                             let ret = Buffer.concat([buf, rem]);
-    //                             if (ret.length != num) reject(new Error("Unable to complete chunk"));
-    //                             else {
-    //                                 console.log("Completed chunk");
-    //                                 resolve(ret);
-    //                             }
-    //                         }
-    //                     })
-    //                 } else if (buf.length == num) {
-    //                     resolve(buf);
-    //                 } else {
-    //                     reject(new Error("Expected " + num + " but got too many (" + buf.length + ")"));
-    //                 }
-    //             }
-    //         } catch (e) {
-    //             reject(e);
-    //         }
-    //         rs.on('readable', () => {
-    //             return this.readBytes(rs, num).then(resolve, reject);
-    //         })
-    //         rs.on('end', () => resolve(null));
-    //         rs.on('close', () => resolve(null));
-    //         rs.on('error', (e: Error) => reject(e));
-    //     })
-    // }
-    // async chunks(handler: Handler): Promise<void> {
-    //     this.handler = handler;
-    //     let file = fs.createReadStream(this.filename);
-    //     while (this.expecting != Expecting.Nothing) {
-    //         await this.processChunk(file, handler);
-    //     }
-    // }
-    // public async processChunk(file: fs.ReadStream, handler: Handler): Promise<void> {
-    //     let next: Buffer | null = null;
-    //     switch (this.expecting) {
-    //         case Expecting.Header:
-    //             next = await this.readBytes(file, 20);
-    //             if (next == null) return;
-    //             this.rem = next;
-    //             if (this.processBuffer() == false) throw new Error("Error reading header");
-    //             return;
-    //         case Expecting.Name:
-    //             if (this.header == null) throw new Error("Expected header to be set when reading name");
-    //             next = await this.readBytes(file, this.header.namelen);
-    //             if (next == null) throw new Error("End of file reading name information");
-    //             this.rem = next;
-    //             if (this.processBuffer() == false) throw new Error("Error reading header");
-    //             return;
-    //         case Expecting.Row:
-    //             if (this.header == null) throw new Error("Expected header to be set when reading row");
-    //             next = await this.readBytes(file, dataSize(this.header.data, this.header.rows));
-    //             if (next == null) throw new Error("End of file reading row");
-    //             this.rem = next;
-    //             if (this.processBuffer() == false) throw new Error("Error reading row");
-    //             return;
-    //     }
-    // }
-    // stream(handler: Handler) {
-    //     this.handler = handler;
-    //     let stream = fs.createReadStream(this.filename, {
-    //         // autoClose?
-    //     });
-    //     stream.on('data', (chunk: Buffer) => {
-    //         console.log(">>> data [" + chunk.length + "]");
-    //     });
-    //     stream.on('readable', () => {
-    //         stream.resume();
-    //     });
-    //     stream.on('end', () => {
-    //         console.log(">>> end");
-    //     });
-    //     stream.on('finish', () => {
-    //         console.log(">>> finish");
-    //     });
-    //     stream.on('close', () => {
-    //         console.log(">>> close");
-    //     });
-    //     stream.on('error', (err: Error) => {
-    //         console.log(">>> error ", err);
-    //     })
-    // }
-    // private sendError(err: Error) {
-    //     console.error("Error encountered: ", err);
-    //     this.handler({ type: "error", err: err });
-    //     this.expecting = Expecting.Nothing;
-    // }
     /**
      * This method returns false if it cannot process anything else.
      */
     processBuffer(handler: Handler): boolean {
         let size = this.state.rem.length;
-        //console.log("Processing a buffer of size: " + size);
         switch (this.state.expecting) {
             case Expecting.Header:
                 if (size < 20) return false;
-                //console.log("header bytes = ", this.rem.slice(0, 20));
                 let type = this.state.rem.readInt32LE(0);
                 let rows = this.state.rem.readInt32LE(4);
                 let cols = this.state.rem.readInt32LE(8);
@@ -214,7 +81,6 @@ export class MatFile {
                 while (dec.length < 4) {
                     dec = "0" + dec;
                 }
-                //console.log("type = ", dec);
 
                 let M = dec[0];
                 let O = dec[1];
@@ -238,8 +104,6 @@ export class MatFile {
                     namelen: namelen,
                 }
 
-                //console.log("header = ", JSON.stringify(this.header));
-
                 this.state.rem = this.state.rem.slice(20);
                 this.state.expecting = Expecting.Name;
                 return true;
@@ -248,12 +112,10 @@ export class MatFile {
                     throw new Error("Reading name, but no header found...this should not happen");
                 }
                 if (size < this.state.header.namelen) return false;
-                //console.log("name buffer = ", this.rem.slice(0, this.header.namelen));
                 let name = this.state.rem.slice(0, this.state.header.namelen - 1).toString("ascii");
-                //console.log("name = ", name);
                 try {
                     if (handler) {
-                        handler({ type: "matrix", name: name });
+                        handler.start(name);
                     }
                 } catch (e) {
                     console.error("Ignoring error in handling matrix event: ", e);
@@ -275,16 +137,15 @@ export class MatFile {
                 }
                 try {
                     if (handler) {
-                        handler({ type: "column", format: this.state.header.matrix, name: this.state.name, colnum: this.state.colnum, column: col });
+                        handler.column(this.state.colnum, this.state.name, this.state.header.matrix, col);
                     }
                 } catch (e) {
                     console.error("Ignore error in handling column event: ", e);
                 }
                 this.state.colnum++;
                 if (this.state.colnum == this.state.header.cols) {
-                    //console.log("End of matrix "+this.name);
                     if (handler) {
-                        handler({ type: "end", name: this.state.name });
+                        handler.end(this.state.name);
                     }
                     this.state.header = null;
                     this.state.colnum = null;

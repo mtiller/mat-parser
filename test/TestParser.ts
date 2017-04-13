@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { MatFile, Event, blobReader, chunkReader } from '../src';
+import { MatFile, blobReader, chunkReader, Handler } from '../src';
 import { Observable } from 'rxjs';
 import path = require('path');
 
@@ -17,10 +17,13 @@ export const highLevelEvents = (e: Event) => {
 
 type Tally = { [key: string]: number };
 
-export const countEvent = (tally: Tally) => {
-    return (e: Event) => {
-        tally[e.type]++;
-    }
+class CountHandler implements Handler {
+    public tally: Tally = { ...initialCounts };
+    start(name: string) { this.tally["matrix"]++ }
+    end(name: string) { this.tally["end"]++ }
+    column() { this.tally["column"]++ }
+    eof() { this.tally["eof"]++ }
+    error() { this.tally["error"]++ }
 }
 
 const initialCounts: Tally = {
@@ -64,59 +67,30 @@ function aggregate(obs: Observable<Buffer>): Promise<Buffer> {
 }
 
 describe("Test readers", () => {
-    it("should work for chunk reader", async () => {
-        let files = Object.keys(counts);
-        for (let i = 0; i < files.length; i++) {
-            let filename = files[i];
+    let files = Object.keys(counts);
+    for (let i = 0; i < files.length; i++) {
+        let filename = files[i];
+        it("should parse '" + filename + "' using chunk reader", async () => {
             let fullname = sampleFile(filename);
             let blob = await aggregate(blobReader(fullname));
             let chunked = await aggregate(chunkReader(fullname));
             expect(blob.length).to.equal(chunked.length, "Expected sizes to match");
             expect(blob).to.deep.equal(chunked);
-        }
-    })
+        })
+    }
 })
 
 describe("Test MATLAB parser", () => {
-    it("should parse samples as observable streams", async () => {
-        let files = Object.keys(counts);
-        for (let i = 0; i < files.length; i++) {
-            let filename = files[i];
-            let tally: Tally = { ...initialCounts };
+    let files = Object.keys(counts);
+    for (let i = 0; i < files.length; i++) {
+        let filename = files[i];
+        it("should parse '"+filename+"' as observable streams", async () => {
             let fullname = sampleFile(filename);
             let obs = blobReader(fullname);
             let file = new MatFile(obs);
-            await file.parse(countEvent(tally));
-            expect(tally).to.deep.equal(counts[filename]);
-        }
-    })
-    // it.skip("should parse an existing MATLAB file as a single blob", async () => {
-    //     let file = new MatFile(sampleFile("Comparison.mat"));
-    //     let tally: Tally = { ...initialCounts };
-    //     await file.blob(countEvent(tally));
-    //     //await file.blob(highLevelEvents);  
-    //     expect(tally).to.deep.equal({
-    //         matrix: 6,
-    //         end: 6,
-    //         eof: 1,
-    //         column: 1243,
-    //         error: 0,
-    //     })
-    // })
-    // it.skip("should parse an existing MATLAB file", async () => {
-    //     let file = new MatFile(sampleFile("Comparison.mat"));
-    //     await file.chunks(highLevelEvents);
-    //     // new MatFile(sampleFile, (e) => {
-    //     //     if (e.type == "column" && e.format == MatrixType.Text) {
-    //     //         //console.log("Column = ", Buffer.from(e.column).toString('ascii'));
-    //     //     } else {
-    //     //         console.log("Event: " + JSON.stringify(e));
-    //     //     }
-    //     // });
-    //     //let emitter: NodeJS.EventEmitter = matlabParser(sampleFile);
-    // })
-    // it.skip("should parse an existing MATLAB file as a stream", async () => {
-    //     let file = new MatFile(sampleFile("Comparison.mat"));
-    //     file.stream(highLevelEvents);
-    // })
+            let handler = new CountHandler();
+            await file.parse(handler);
+            expect(handler.tally).to.deep.equal(counts[filename]);
+        })
+    }
 })

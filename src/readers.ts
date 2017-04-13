@@ -21,9 +21,6 @@ export function chunkReader(filename: string) {
         count += chunk.length;
         subj.next(chunk);
     })
-    stream.on('readable', () => {
-        //console.log("Readable received...what does this mean");
-    })
     stream.on('end', () => {
         subj.complete();
     })
