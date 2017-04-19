@@ -4,11 +4,15 @@
   "description": "A parser for MATLAB v4 files",
   "main": "lib/index.js",
   "scripts": {
+    "compile": "tsc",
     "test": "mocha"
   },
   "keywords": [
     "MATLAB"
   ],
+  "bin": {
+    "dsres": "./lib/src/scripts/dsres.js"
+  },
   "author": "Michael M. Tiller",
   "license": "MIT",
   "devDependencies": {
@@ -17,10 +21,14 @@
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
     "ts-node": "^3.0.2",
-    "typescript": "^2.2.2"
+    "typescript": "2.3.0"
   },
   "dependencies": {
+    "@types/minimatch": "^2.0.29",
     "@types/node": "^7.0.12",
-    "rxjs": "^5.3.0"
+    "@types/yargs": "^6.6.0",
+    "minimatch": "^3.0.3",
+    "rxjs": "^5.3.0",
+    "yargs": "^7.1.0"
   }
 }
