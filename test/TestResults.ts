@@ -13,7 +13,7 @@ describe("Test Dymola results processing", () => {
             expect(sig).to.not.equal(undefined);
             let trajs = sig.trajs;
             let finals = sig.finals;
-            let handler = new DymolaResultsExtractor(Object.keys(trajs), Object.keys(finals));
+            let handler = new DymolaResultsExtractor((n) => Object.keys(trajs).indexOf(n)>=0, (n) => Object.keys(finals).indexOf(n)>=0);
             await file.parse(handler);
             expect(Object.keys(handler.trajectories)).to.deep.equal(Object.keys(trajs));
             expect(Object.keys(handler.finals)).to.deep.equal(Object.keys(finals));

@@ -1,5 +1,4 @@
 import { NullHandler, MatrixType } from '../parser';
-import { makeRe } from 'minimatch';
 
 export interface VariableDetails {
     description?: string;
@@ -12,75 +11,70 @@ export interface VariableDetails {
 export class DymolaResultsExtractor extends NullHandler {
     private tdets: { [key: string]: VariableDetails };
     private fdets: { [key: string]: VariableDetails };
+    private tcols: { [key: number]: string };
+    private fcols: { [key: number]: string };
     public trajectories: { [key: string]: Array<number> | number };
     public finals: { [key: string]: number | null };
-    private trajExpr: Array<RegExp>;
-    private finalExpr: Array<RegExp>;
-    constructor(trajNames: string[], finalNames: string[]) {
+    constructor(protected trajPredicate: (name: string) => boolean, protected finalPredicate: (name: string) => boolean) {
         super();
         this.tdets = {};
         this.fdets = {};
-
-        this.trajExpr = trajNames.map((name) => {
-            let p = name.replace("[", "\\[").replace("]", "\\]");
-            let r = makeRe(p);
-            //r.compile();
-            return r;
-        });
-        this.finalExpr = finalNames.map((name) => {
-            let p = name.replace("[", "\\[").replace("]", "\\]");
-            let r = makeRe(p);
-            //r.compile();
-            return r;
-        });
+        this.tcols = {};
+        this.fcols = {};
 
         this.trajectories = {};
         this.finals = {};
     }
+    start(name: string) {
+        //console.log("Reading " + name);
+    }
+    end(name: string) {
+        //console.log("Finished reading " + name);
+    }
     column(name: string, colnum: number, format: MatrixType, column: Array<any>, last: boolean): void {
         if (name == "name") {
             let str = new Buffer(column).toString('ascii').trim();
-            if (this.trajExpr.some((n) => n.test(str))) {
+            if (this.trajPredicate(str)) {
                 this.tdets[str] = {
                     varnum: colnum,
                 }
+                this.tcols[colnum] = str;
                 this.trajectories[str] = [];
             }
-            if (this.finalExpr.some((n) => n.test(str))) {
+
+            if (this.finalPredicate(str)) {
                 this.fdets[str] = {
                     varnum: colnum,
                 }
+                this.fcols[colnum] = str;
                 this.finals[str] = null;
             }
         }
         if (name == "description") {
-            let str = new Buffer(column).toString('ascii').trim();
-            Object.keys(this.tdets).forEach((key) => {
-                if (this.tdets[key].column == colnum) {
-                    this.tdets[key].description = str;
-                }
-            })
-            Object.keys(this.fdets).forEach((key) => {
-                if (this.fdets[key].column == colnum) {
-                    this.fdets[key].description = str;
-                }
-            })
+            if (this.tcols.hasOwnProperty(colnum)) {
+                let name = this.tcols[colnum];
+                let str = new Buffer(column).toString('ascii').trim();
+                this.tdets[name].description = str;
+            }
+            if (this.fcols.hasOwnProperty(colnum)) {
+                let name = this.fcols[colnum];
+                let str = new Buffer(column).toString('ascii').trim();
+                this.fdets[name].description = str;
+            }
         }
         if (name == "dataInfo") {
-            Object.keys(this.tdets).forEach((key) => {
-                if (this.tdets[key].varnum == colnum) {
-                    this.tdets[key].constant = column[0] == 1;
-                    this.tdets[key].column = Math.abs(column[1]) - 1;
-                    this.tdets[key].scale = column[1] >= 0 ? 1 : -1;
-                }
-            })
-            Object.keys(this.fdets).forEach((key) => {
-                if (this.fdets[key].varnum == colnum) {
-                    this.fdets[key].constant = column[0] == 1;
-                    this.fdets[key].column = Math.abs(column[1]) - 1;
-                    this.fdets[key].scale = column[1] >= 0 ? 1 : -1;
-                }
-            })
+            if (this.tcols.hasOwnProperty(colnum)) {
+                let key = this.tcols[colnum];
+                this.tdets[key].constant = column[0] == 1;
+                this.tdets[key].column = Math.abs(column[1]) - 1;
+                this.tdets[key].scale = column[1] >= 0 ? 1 : -1;
+            }
+            if (this.fcols.hasOwnProperty(colnum)) {
+                let key = this.fcols[colnum];
+                this.fdets[key].constant = column[0] == 1;
+                this.fdets[key].column = Math.abs(column[1]) - 1;
+                this.fdets[key].scale = column[1] >= 0 ? 1 : -1;
+            }
         }
 
         if (name == "data_1") {

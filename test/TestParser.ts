@@ -37,6 +37,13 @@ describe("Test readers", () => {
             expect(blob.length).to.equal(chunked.length, "Expected sizes to match");
             expect(blob).to.deep.equal(chunked);
         })
+        it("should get the same answer if invoked twice", async () => {
+            let fullname = sampleFile(filename);
+            let blob1 = await aggregate(blobReader(fullname));
+            let blob2 = await aggregate(blobReader(fullname));
+            expect(blob1.length).to.equal(blob2.length, "Expected sizes to match");
+            expect(blob1).to.deep.equal(blob2);
+        })
     }
 })
 
@@ -50,6 +57,22 @@ describe("Test MATLAB parser", () => {
             let handler = new CountHandler();
             await file.parse(handler);
             expect(handler.tally).to.deep.equal(counts[filename]);
+        })
+
+        it("should get the same results if parsed twice", async () => {
+            let fullname = sampleFile(filename);
+            let obs1 = blobReader(fullname);
+            let file1 = new MatFile(obs1);
+            let handler1 = new CountHandler();
+            await file1.parse(handler1);
+
+            let obs2 = blobReader(fullname);
+            let file2 = new MatFile(obs2);
+            let handler2 = new CountHandler();
+            await file2.parse(handler2);
+
+            expect(handler1.tally).to.deep.equal(counts[filename]);
+            expect(handler2.tally).to.deep.equal(counts[filename]);
         })
     }
 })
