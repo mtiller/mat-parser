@@ -67,6 +67,10 @@ async function run() {
     let parts: string[] = [];
     if (args.parts) {
         parts = await partNames(filename);
+        console.log("Parts found: ");
+        parts.forEach((part) => {
+            console.log("  "+part);
+        })
     }
 
     let obs = blobReader(filename);
