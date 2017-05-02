@@ -6,6 +6,8 @@ import yargs = require('yargs');
 import fs = require('fs');
 import * as msgpack5 from 'msgpack5';
 
+import { belongsToPart, partNames } from '../utils';
+
 const msgpack = msgpack5({});
 let opts = yargs
     .default("outfile", null, "Output file")
@@ -22,32 +24,6 @@ if (args._.length != 1) {
     process.exit(1);
 }
 
-function partPredicate(n: string) {
-    return n.endsWith(".Form");
-}
-
-function matchsNothing(n: string) {
-    return false;
-}
-
-export function forPart(parts: string[]) {
-    return (name: string) => {
-        if (parts.some((n) => name.startsWith(n + "."))) {
-            return true;
-        }
-        return false;
-    }
-}
-
-async function partNames(filename: string): Promise<string[]> {
-    let obs = blobReader(filename);
-    let file = new MatFile(obs);
-    let handler = new DymolaResultsExtractor(partPredicate, matchsNothing);
-    await file.parse(handler);
-    let signals = Object.keys(handler.trajectories);
-    return signals.map((n) => n.slice(0, n.length - 5));
-}
-
 async function run() {
     let filename = args._[0];
 
@@ -59,7 +35,7 @@ async function run() {
 
     let obs = blobReader(filename);
     let file = new MatFile(obs);
-    let handler = new DymolaResultsExtractor(forPart(parts), () => false);
+    let handler = new DymolaResultsExtractor(belongsToPart(parts), () => false);
     await file.parse(handler);
     let trajs = {
         trajectories: handler.trajectories,
