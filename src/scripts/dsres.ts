@@ -7,11 +7,13 @@ import fs = require('fs');
 let opts = yargs
     .default("final", [], "Variables to get the final value for")
     .default("signal", [], "Variables to get the continuous signal for")
+    .default("root", [], "Variables that start at this part")
     .default("outfile", null, "Output file")
     .default("pretty", true, "Pretty output")
     .default("parts", false, "Include all data for 3D parts")
     .alias("f", "final")
     .alias("s", "signal")
+    .alias("r", "root")
     .alias("o", "outfile")
     .alias("p", "pretty")
     .alias("d", "parts")
@@ -25,19 +27,12 @@ if (args._.length != 1) {
 
 if (!Array.isArray(args.final)) args.final = [args.final];
 if (!Array.isArray(args.signal)) args.signal = [args.signal];
+if (!Array.isArray(args.root)) args.root = [args.root];
 
-function partPredicate(n: string) {
-    return n.endsWith(".Form");
-}
-
-function matchsNothing(n: string) {
-    return false;
-}
-
-export function partOrSignal(parts: string[], signals: string[]) {
+export function partOrSignal(signals: string[], root: string[]) {
     return (name: string) => {
         if (signals.indexOf(name) >= 0) return true;
-        if (parts.some((n) => name.startsWith(n + "."))) {
+        if (root.some((n) => name.startsWith(n + "."))) {
             return true;
         }
         return false;
@@ -50,32 +45,16 @@ function matchsNames(names: string[]) {
     }
 }
 
-async function partNames(filename: string): Promise<string[]> {
-    let obs = blobReader(filename);
-    let file = new MatFile(obs);
-    let handler = new DymolaResultsExtractor(partPredicate, matchsNothing);
-    await file.parse(handler);
-    let signals = Object.keys(handler.trajectories);
-    return signals.map((n) => n.slice(0, n.length - 5));
-}
-
 async function run() {
     let filename = args._[0];
 
     let signals = [...args.signal];
-
-    let parts: string[] = [];
-    if (args.parts) {
-        parts = await partNames(filename);
-        console.log("Parts found: ");
-        parts.forEach((part) => {
-            console.log("  "+part);
-        })
-    }
+    let roots = [...args.root];
+    console.log("root = ", roots);
 
     let obs = blobReader(filename);
     let file = new MatFile(obs);
-    let handler = new DymolaResultsExtractor(partOrSignal(parts, signals), matchsNames(args.final));
+    let handler = new DymolaResultsExtractor(partOrSignal(signals, roots), matchsNames(args.final));
     await file.parse(handler);
     let result = {
         trajectories: handler.trajectories,
