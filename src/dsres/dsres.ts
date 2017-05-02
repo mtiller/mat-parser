@@ -8,6 +8,27 @@ export interface VariableDetails {
     scale?: number;
 }
 
+export class DymolaSignalExtractor extends NullHandler {
+    protected columns: { [colnum: number]: string } = {};
+    public descriptions: { [signal: string]: string } = {};
+    column(name: string, colnum: number, format: MatrixType, column: Array<any>, last: boolean): void {
+        if (name == "name") {
+            let str = new Buffer(column).toString('ascii').trim();
+            this.columns[colnum] = str;
+        }
+        if (name == "description") {
+            let name = this.columns[colnum];
+            let desc = new Buffer(column).toString('ascii').trim();
+            this.descriptions[name] = desc;
+        }
+    }
+    end(name: string) {
+        if (name == "description") {
+            //return true;
+        }
+    }
+}
+
 export class DymolaResultsExtractor extends NullHandler {
     private tdets: { [key: string]: VariableDetails };
     private fdets: { [key: string]: VariableDetails };

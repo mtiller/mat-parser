@@ -1,10 +1,21 @@
 import { files, sampleFile, signals } from './data';
-import { blobReader, MatFile, DymolaResultsExtractor } from '../src';
+import { blobReader, MatFile, DymolaResultsExtractor, DymolaSignalExtractor } from '../src';
 import { expect } from 'chai';
 
 describe("Test Dymola results processing", () => {
     for (let i = 0; i < files.length; i++) {
         let filename = files[i];
+        it("should parse signal names from '"+filename+"'", async () => {
+            let fullname = sampleFile(filename);
+            let obs = blobReader(fullname);
+            let file = new MatFile(obs);
+            let handler = new DymolaSignalExtractor();
+            await file.parse(handler);
+            let names = Object.keys(handler.descriptions);
+            expect(names).to.contain("Time");
+            expect(names.length).to.equal(signals[filename].signals);
+            //expect(Object.keys(handler.descriptions).length).to.be.greaterThan(0);
+        })
         it("should parse results from '" + filename + "'", async () => {
             let fullname = sampleFile(filename);
             let obs = blobReader(fullname);

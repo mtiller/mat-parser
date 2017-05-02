@@ -21,7 +21,7 @@ export const initialCounts: Tally = {
 export type TrajectoryResult = { [key: string]: number };
 export type FinalResult = { [key: string]: number };
 
-export type Signals = { [filename: string]: { trajs: TrajectoryResult, finals: FinalResult }}
+export type Signals = { [filename: string]: { trajs: TrajectoryResult, finals: FinalResult, signals: number }}
 
 export const signals: Signals = {
     "Comparison.mat": {
@@ -33,6 +33,7 @@ export const signals: Signals = {
             "Time": 1,
             "nr_nl.I1.der(phi)": 0.017469031736254692,
         },
+        signals: 229,
     },
     "ACDC.mat": {
         trajs: {
@@ -43,6 +44,7 @@ export const signals: Signals = {
             "Time": 1,
             "load_switch.width[1]": 50,
         },
+        signals: 91,
     }
 }
 export const counts = {
