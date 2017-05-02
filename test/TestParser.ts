@@ -6,7 +6,7 @@ import { files, counts, initialCounts, Tally, sampleFile } from './data';
 class CountHandler implements Handler {
     public tally: Tally = { ...initialCounts };
     start(name: string) { this.tally["matrix"]++ }
-    end(name: string) { this.tally["end"]++ }
+    end(name: string) { this.tally["end"]++; return false }
     column() { this.tally["column"]++ }
     eof() { this.tally["eof"]++ }
     error() { this.tally["error"]++ }

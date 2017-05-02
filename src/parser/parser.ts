@@ -147,22 +147,31 @@ export class MatFile {
                 try {
                     if (handler) {
                         handler.column(this.state.name, this.state.colnum, this.state.header.matrix,
-                            col, this.state.colnum == this.state.header.cols-1);
+                            col, this.state.colnum == this.state.header.cols - 1);
                     }
                 } catch (e) {
                     console.error("Ignore error in handling column event: ", e);
                 }
                 this.state.colnum++;
                 if (this.state.colnum == this.state.header.cols) {
+                    let stop: boolean = false;
                     if (handler) {
-                        handler.end(this.state.name);
+                        stop = handler.end(this.state.name);
                     }
                     this.state.header = null;
                     this.state.colnum = null;
                     this.state.name = null;
-                    this.state.expecting = Expecting.Header;
+                    if (stop) {
+                        this.state.expecting = Expecting.Nothing;
+                    } else {
+                        this.state.expecting = Expecting.Header;
+                    }
                 }
                 return true;
+            case Expecting.Nothing:
+                this.state.name = null;
+                this.state.rem = new Buffer([]);
+                return false;
             default:
                 throw new Error("Unexpected state: " + this.state.expecting);
         }

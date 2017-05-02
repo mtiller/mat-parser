@@ -22,10 +22,11 @@ export class DymolaSignalExtractor extends NullHandler {
             this.descriptions[name] = desc;
         }
     }
-    end(name: string) {
+    end(name: string): boolean {
         if (name == "description") {
-            //return true;
+            return true;
         }
+        return false;
     }
 }
 
@@ -45,12 +46,6 @@ export class DymolaResultsExtractor extends NullHandler {
 
         this.trajectories = {};
         this.finals = {};
-    }
-    start(name: string) {
-        //console.log("Reading " + name);
-    }
-    end(name: string) {
-        //console.log("Finished reading " + name);
     }
     column(name: string, colnum: number, format: MatrixType, column: Array<any>, last: boolean): void {
         if (name == "name") {
