@@ -11,8 +11,8 @@ import { belongsToPart, partNames } from '../utils';
 const msgpack = msgpack5({});
 let opts = yargs
     .default("outfile", null, "Output file")
-    .default("pretty", true, "Pretty output")
-    .default("msgpack", true, "Write in msgpack format")
+    .default("pretty", false, "Pretty output")
+    .default("msgpack", false, "Write in msgpack format")
     .alias("o", "outfile")
     .alias("p", "pretty")
     .alias("m", "msgpack")
@@ -45,7 +45,11 @@ async function run() {
     if (args.pretty && args.msgpack) {
         throw new Error("--pretty and --msgpack are mutually incompatible");
     }
-    let col = loadDymolaResults(trajs, {});
+    let col = loadDymolaResults(trajs, {
+        reportUnknown: true,
+        logParts: true,
+        urls: {},
+    });
     let serialize = (col: PartCollection) => {
         if (args.msgpack) return msgpack.encode(col);
         if (args.pretty) return JSON.stringify(col, null, 4);
