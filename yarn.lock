@@ -34,9 +34,9 @@
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-6.6.0.tgz#91f8e2580a8083049f78311c059aa57d6949df6b"
 
-"@xogeny/part-collection@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@xogeny/part-collection/-/part-collection-0.1.3.tgz#cb9323aa133db835e7cebefdd36bd72e363d0e8d"
+"@xogeny/part-collection@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@xogeny/part-collection/-/part-collection-0.1.6.tgz#639acc76dac6c06736e307ba9f388be68ea0ac47"
 
 ansi-regex@^2.0.0:
   version "2.1.1"
