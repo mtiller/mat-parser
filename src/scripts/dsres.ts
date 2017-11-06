@@ -4,6 +4,10 @@ import { DymolaResultsExtractor } from '../dsres';
 import yargs = require('yargs');
 import fs = require('fs');
 
+import * as debug from 'debug';
+const dsresDebug = debug("mat-parser:dsres");
+// dsresDebug.enabled = true;
+
 let opts = yargs
     .default("final", [], "Variables to get the final value for")
     .default("signal", [], "Variables to get the continuous signal for")
@@ -20,6 +24,8 @@ let opts = yargs
     .alias("d", "parts")
 
 let args = opts.argv;
+
+dsresDebug("args = %o", args);
 
 if (args._.length != 1) {
     console.error("Usage: " + args["$0"] + " [options] file");
@@ -53,7 +59,7 @@ async function run() {
     let signals = [...args.signal];
     let roots = [...args.root];
     let stats = args.stats;
-    console.log("root = ", roots);
+    dsresDebug("root = %o", roots);
 
     let obs = blobReader(filename);
     let file = new MatFile(obs);
@@ -65,19 +71,19 @@ async function run() {
     }
 
     if (stats) {
-        console.log("Signals: ");
+        dsresDebug("Signals: ");
         Object.keys(result.trajectories).forEach((key) => {
             let val = result.trajectories[key];
             if (Array.isArray(val)) {
-                console.log("  " + key + " = ", val[0] + " .. " + val[val.length - 1]);
+                dsresDebug("  %s = %d .. %d", key, val[0], val[val.length - 1]);
             } else {
-                console.log("  " + key + " = ", val);
+                dsresDebug("  %s = %d", key, val);
             }
         })
-        console.log("Final Values: ");
+        dsresDebug("Final Values: ");
         Object.keys(result.final).forEach((key) => {
             let val = result.final[key];
-            console.log("  " + key + " = " + val);
+            dsresDebug("  %s = %d", key, val);
         })
     }
     if (args.outfile) {

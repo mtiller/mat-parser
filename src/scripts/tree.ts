@@ -2,8 +2,11 @@ import { blobReader } from '../readers';
 import { MatFile } from '../parser';
 import { DymolaResultsExtractor } from '../dsres';
 import yargs = require('yargs');
+import * as fs from 'fs';
 
 let opts = yargs
+    .default("outfile", null, "Output file")
+    .alias("o", "outfile")
 
 let args = opts.argv;
 
@@ -20,8 +23,13 @@ async function run() {
     let handler = new DymolaResultsExtractor(() => true, () => false);
     await file.parse(handler);
     let signals = Object.keys(handler.trajectories);
-    console.log("Signals: ");
-    signals.forEach((signal) => console.log(signal));
+    if (args.outfile) {
+        fs.writeFileSync(args.outfile, JSON.stringify({ signals: signals }, null, 4));
+    } else {
+        console.log(JSON.stringify({ signals: signals }, null, 4));
+    }
+
+    //signals.forEach((signal) => console.log(signal));
 }
 
 run().catch((e) => console.error(e));

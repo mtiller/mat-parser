@@ -5,6 +5,9 @@ import { loadDymolaResults, PartCollection } from '@xogeny/part-collection';
 import yargs = require('yargs');
 import fs = require('fs');
 import * as msgpack5 from 'msgpack5';
+import * as debug from 'debug';
+
+const partsDebug = debug("mat-parser:parts");
 
 import { belongsToPart, partNames } from '../utils';
 
@@ -28,9 +31,9 @@ async function run() {
     let filename = args._[0];
 
     let parts = await partNames(filename);
-    console.log("Parts found: ");
+    partsDebug("Parts found: ");
     parts.forEach((part) => {
-        console.log("  " + part);
+        partsDebug("  %o", part);
     })
 
     let obs = blobReader(filename);
