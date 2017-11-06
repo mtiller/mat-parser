@@ -122,6 +122,7 @@ export class MatFile {
                 }
                 if (size < this.state.header.namelen) return false;
                 let name = this.state.rem.slice(0, this.state.header.namelen - 1).toString("ascii");
+                console.log("Header for '" + name + "' = " + JSON.stringify(this.state.header));
                 try {
                     if (handler) {
                         handler.start(name, this.state.header.rows, this.state.header.cols);

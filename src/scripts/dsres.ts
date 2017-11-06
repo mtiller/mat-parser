@@ -10,6 +10,7 @@ let opts = yargs
     .default("root", [], "Variables that start at this part")
     .default("outfile", null, "Output file")
     .default("pretty", true, "Pretty output")
+    .default("stats", false, "Statistics")
     .default("parts", false, "Include all data for 3D parts")
     .alias("f", "final")
     .alias("s", "signal")
@@ -31,6 +32,7 @@ if (!Array.isArray(args.root)) args.root = [args.root];
 
 export function partOrSignal(signals: string[], root: string[]) {
     return (name: string) => {
+        if (signals.indexOf("*") >= 0) return true;
         if (signals.indexOf(name) >= 0) return true;
         if (root.some((n) => name.startsWith(n + "."))) {
             return true;
@@ -41,7 +43,7 @@ export function partOrSignal(signals: string[], root: string[]) {
 
 function matchsNames(names: string[]) {
     return (name: string) => {
-        return names.indexOf(name) >= 0;
+        return names.indexOf("*") >= 0 || names.indexOf(name) >= 0;
     }
 }
 
@@ -50,6 +52,7 @@ async function run() {
 
     let signals = [...args.signal];
     let roots = [...args.root];
+    let stats = args.stats;
     console.log("root = ", roots);
 
     let obs = blobReader(filename);
@@ -59,6 +62,23 @@ async function run() {
     let result = {
         trajectories: handler.trajectories,
         final: handler.finals,
+    }
+
+    if (stats) {
+        console.log("Signals: ");
+        Object.keys(result.trajectories).forEach((key) => {
+            let val = result.trajectories[key];
+            if (Array.isArray(val)) {
+                console.log("  " + key + " = ", val[0] + " .. " + val[val.length - 1]);
+            } else {
+                console.log("  " + key + " = ", val);
+            }
+        })
+        console.log("Final Values: ");
+        Object.keys(result.final).forEach((key) => {
+            let val = result.final[key];
+            console.log("  " + key + " = " + val);
+        })
     }
     if (args.outfile) {
         if (args.pretty) {
