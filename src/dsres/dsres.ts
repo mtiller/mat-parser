@@ -11,7 +11,7 @@ export interface VariableDetails {
 function trim(a: Array<any>): string {
     let buf = new Buffer(a);
     let str = buf.toString('ascii');
-    str.replace(/\0/g, "");
+    str = str.replace(/\0/g, "");
     return str.trim();
 }
 
