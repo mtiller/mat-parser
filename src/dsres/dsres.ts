@@ -8,17 +8,24 @@ export interface VariableDetails {
     scale?: number;
 }
 
+function trim(a: Array<any>): string {
+    let buf = new Buffer(a);
+    let str = buf.toString('ascii');
+    str.replace(/\0/g, "");
+    return str.trim();
+}
+
 export class DymolaSignalExtractor extends NullHandler {
     protected columns: { [colnum: number]: string } = {};
     public descriptions: { [signal: string]: string } = {};
     column(name: string, colnum: number, format: MatrixType, column: Array<any>, last: boolean): void {
         if (name == "name") {
-            let str = new Buffer(column).toString('ascii').trim();
+            let str = trim(column);
             this.columns[colnum] = str;
         }
         if (name == "description") {
             let name = this.columns[colnum];
-            let desc = new Buffer(column).toString('ascii').trim();
+            let desc = trim(column);
             this.descriptions[name] = desc;
         }
     }
@@ -49,7 +56,7 @@ export class DymolaResultsExtractor extends NullHandler {
     }
     column(name: string, colnum: number, format: MatrixType, column: Array<any>, last: boolean): void {
         if (name == "name") {
-            let str = new Buffer(column).toString('ascii').trim();
+            let str = trim(column);
             if (this.trajPredicate(str)) {
                 this.tdets[str] = {
                     varnum: colnum,
@@ -69,12 +76,12 @@ export class DymolaResultsExtractor extends NullHandler {
         if (name == "description") {
             if (this.tcols.hasOwnProperty(colnum)) {
                 let name = this.tcols[colnum];
-                let str = new Buffer(column).toString('ascii').trim();
+                let str = trim(column);
                 this.tdets[name].description = str;
             }
             if (this.fcols.hasOwnProperty(colnum)) {
                 let name = this.fcols[colnum];
-                let str = new Buffer(column).toString('ascii').trim();
+                let str = trim(column);
                 this.fdets[name].description = str;
             }
         }
@@ -96,29 +103,25 @@ export class DymolaResultsExtractor extends NullHandler {
         if (name == "data_1") {
             Object.keys(this.tdets).forEach((key) => {
                 if (this.tdets[key].constant) {
-                    let tkey = key.trim();
-                    this.trajectories[tkey] = (this.tdets[key].scale as number) * column[this.tdets[key].column as number];
+                    this.trajectories[key] = (this.tdets[key].scale as number) * column[this.tdets[key].column as number];
                 }
             })
             Object.keys(this.fdets).forEach((key) => {
                 if (this.fdets[key].constant) {
-                    let tkey = key.trim();
-                    this.finals[tkey] = (this.fdets[key].scale as number) * column[this.fdets[key].column as number];
+                    this.finals[key] = (this.fdets[key].scale as number) * column[this.fdets[key].column as number];
                 }
             })
         }
         if (name == "data_2") {
             Object.keys(this.tdets).forEach((key) => {
                 if (!this.tdets[key].constant) {
-                    let tkey = key.trim();
-                    (this.trajectories[tkey] as number[]).push((this.tdets[key].scale as number) * column[this.tdets[key].column as number]);
+                    (this.trajectories[key] as number[]).push((this.tdets[key].scale as number) * column[this.tdets[key].column as number]);
                 }
             })
             if (last) {
                 Object.keys(this.fdets).forEach((key) => {
                     if (!this.fdets[key].constant) {
-                        let tkey = key.trim();
-                        this.finals[tkey] = (this.fdets[key].scale as number) * column[this.fdets[key].column as number];
+                        this.finals[key] = (this.fdets[key].scale as number) * column[this.fdets[key].column as number];
                     }
                 })
             }
