@@ -96,25 +96,29 @@ export class DymolaResultsExtractor extends NullHandler {
         if (name == "data_1") {
             Object.keys(this.tdets).forEach((key) => {
                 if (this.tdets[key].constant) {
-                    this.trajectories[key] = (this.tdets[key].scale as number) * column[this.tdets[key].column as number];
+                    let tkey = key.trim();
+                    this.trajectories[tkey] = (this.tdets[key].scale as number) * column[this.tdets[key].column as number];
                 }
             })
             Object.keys(this.fdets).forEach((key) => {
                 if (this.fdets[key].constant) {
-                    this.finals[key] = (this.fdets[key].scale as number) * column[this.fdets[key].column as number];
+                    let tkey = key.trim();
+                    this.finals[tkey] = (this.fdets[key].scale as number) * column[this.fdets[key].column as number];
                 }
             })
         }
         if (name == "data_2") {
             Object.keys(this.tdets).forEach((key) => {
                 if (!this.tdets[key].constant) {
-                    (this.trajectories[key] as number[]).push((this.tdets[key].scale as number) * column[this.tdets[key].column as number]);
+                    let tkey = key.trim();
+                    (this.trajectories[tkey] as number[]).push((this.tdets[key].scale as number) * column[this.tdets[key].column as number]);
                 }
             })
             if (last) {
                 Object.keys(this.fdets).forEach((key) => {
                     if (!this.fdets[key].constant) {
-                        this.finals[key] = (this.fdets[key].scale as number) * column[this.fdets[key].column as number];
+                        let tkey = key.trim();
+                        this.finals[tkey] = (this.fdets[key].scale as number) * column[this.fdets[key].column as number];
                     }
                 })
             }
