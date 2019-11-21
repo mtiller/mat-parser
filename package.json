@@ -1,6 +1,6 @@
 {
   "name": "@xogeny/mat-parser",
-  "version": "0.2.6",
+  "version": "0.4.1",
   "description": "A parser for MATLAB v4 files",
   "main": "lib/src/index.js",
   "typings": "lib/src/index.d.ts",
@@ -9,6 +9,9 @@
     "build": "tsc",
     "test": "jest"
   },
+  "files": [
+    "./lib/**"
+  ],
   "keywords": [
     "MATLAB"
   ],
