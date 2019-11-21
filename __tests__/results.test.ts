@@ -1,4 +1,4 @@
-import { files, sampleFile, signals } from "./data";
+import { files, sampleFile, signals } from "../src/testing";
 import {
   blobReader,
   MatFile,

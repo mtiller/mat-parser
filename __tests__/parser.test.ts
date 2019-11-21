@@ -1,6 +1,12 @@
 import { MatFile, blobReader, chunkReader, Handler } from "../src";
 import { Observable } from "rxjs";
-import { files, counts, initialCounts, Tally, sampleFile } from "./data";
+import {
+  files,
+  counts,
+  initialCounts,
+  Tally,
+  sampleFile
+} from "../src/testing";
 
 class CountHandler implements Handler {
   public tally: Tally = { ...initialCounts };
