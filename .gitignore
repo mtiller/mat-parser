@@ -1,4 +1,4 @@
 node_modules
 lib
 *.json
-npm-debug.log
+*.log
