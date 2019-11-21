@@ -1,34 +1,25 @@
 {
-    "compilerOptions": {
-        "outDir": "./lib",
-        "target": "es2016",
-        "lib": [
-            "es2016",
-            "dom"
-        ],
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "isolatedModules": false,
-        "jsx": "react",
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "declaration": true,
-        "noImplicitAny": true,
-        "removeComments": false,
-        "noLib": false,
-        "preserveConstEnums": true,
-        "strictNullChecks": true,
-        "noUnusedLocals": true,
-        "noImplicitThis": true,
-        "noImplicitReturns": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "sourceMap": true
-    },
-    "exclude": [
-        ".vscode",
-        "coverage",
-        "node_modules",
-        "lib",
-        "retired"
-    ]
+  "compilerOptions": {
+    "outDir": "./lib",
+    "target": "es2018",
+    "lib": ["es2018", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "isolatedModules": false,
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declaration": true,
+    "noImplicitAny": true,
+    "removeComments": false,
+    "noLib": false,
+    "preserveConstEnums": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "sourceMap": true
+  },
+  "exclude": [".vscode", "coverage", "node_modules", "lib", "retired"]
 }
